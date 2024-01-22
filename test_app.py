@@ -82,7 +82,7 @@ def main():
     st.title("Home services Application")
 
      # Sidebar with options
-    page_options = ["Home", "Prediction","Service Retrieval","Chatbot: Question Answering","Summary","Explanation"]
+    page_options = ["Home","Service Retrieval","Chatbot: Question Answering","Explanation"]
     page = st.sidebar.selectbox("Choose a page", page_options)
 
     
