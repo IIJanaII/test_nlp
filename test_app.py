@@ -183,7 +183,7 @@ def main():
             st.session_state.context_string = context_string
 
                 # Perform question answering
-            
+            qa = pipeline('question-answering')
             answer = qa(context=context_string, question=prompt)
 
             with st.chat_message("assistant"):
