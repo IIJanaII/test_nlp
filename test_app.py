@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
+
 import time
 
 
@@ -12,6 +13,8 @@ import time
 
 df=pd.read_csv("df_mergedV4.csv",sep=',')
 filtered_documents=df.copy()
+
+qa = pipeline('question-answering')
 
 @st.cache_data(persist=True)
 def get_tfidf_vectorizer(description_trad_clean):
@@ -72,6 +75,8 @@ def preprocess_text(text):
 
 
 
+
+
 # Streamlit App
 def main():
     st.title("Home services Application")
@@ -105,7 +110,7 @@ def main():
 
     elif page == "Service Retrieval":
         st.header("Service Retrieval Page")
-        query_summary = st.text_area("✏ Enter your request :")
+        query_summary = st.text_area("✏️ Enter your request :")
 
         if st.button("Retrieve Services"):
             if query_summary:
@@ -119,8 +124,8 @@ def main():
                 # Display the top 10 results
                 st.subheader("Top 10 Services:")
                 for i, (index, row) in enumerate(top_documents.iterrows(), 1):
-                    st.write(f"{i}. *{row['name']}*")
-                    st.write(f"   Average Score: {row['average_score']:.2f} ⭐")
+                    st.write(f"{i}. **{row['name']}**")
+                    st.write(f"   Average Score: {row['average_score']:.2f} ⭐️")
 
                     # Calculate impact based on average score (customize the impact calculation as needed)
                     impact = row['average_score'] * 0.1  # Adjust the multiplication factor as needed
@@ -178,7 +183,7 @@ def main():
             st.session_state.context_string = context_string
 
                 # Perform question answering
-            qa = pipeline('question-answering')
+            
             answer = qa(context=context_string, question=prompt)
 
             with st.chat_message("assistant"):
@@ -217,11 +222,14 @@ def main():
                     message_placeholder.markdown(full_response)
                 # Add assistant response to chat history
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
-    else:
+        else:
             st.text("Continue with the same context. Ask another question.")
             st.session_state.context_string=[]
     
 
+  
+    
 
-if _name_ == "_main_":
-    main()
+
+if __name__ == "__main__":
+    main()
