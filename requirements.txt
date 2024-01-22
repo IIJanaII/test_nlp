@@ -24,7 +24,7 @@ spacy-loggers==1.0.5
 
 
 streamlit==1.27.2
-
+transformers==4.36.2
 
 tokenizers==0.10.3
 
