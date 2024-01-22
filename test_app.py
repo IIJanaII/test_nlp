@@ -199,24 +199,24 @@ def main():
 
             
                 # Option to refresh or continue with the same context
-    elif prompt and st.session_state.context_string!=[]:
-            qa = pipeline('question-answering')
-            answer = qa(context=st.session_state.context_string, question=prompt)
-            print("prompt",prompt)
+        elif prompt and st.session_state.context_string!=[]:
+                qa = pipeline('question-answering')
+                answer = qa(context=st.session_state.context_string, question=prompt)
+                print("prompt",prompt)
 
-            with st.chat_message("assistant"):
-                message_placeholder=st.empty()
-                full_response=""
-                assistant_response=answer['answer']
+                with st.chat_message("assistant"):
+                    message_placeholder=st.empty()
+                    full_response=""
+                    assistant_response=answer['answer']
 
-                for chunk in assistant_response.split():
-                    full_response += chunk + " "
-                    time.sleep(0.05)
-                    # Add a blinking cursor to simulate typing
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
-             # Add assistant response to chat history
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    for chunk in assistant_response.split():
+                        full_response += chunk + " "
+                        time.sleep(0.05)
+                        # Add a blinking cursor to simulate typing
+                        message_placeholder.markdown(full_response + "▌")
+                    message_placeholder.markdown(full_response)
+                # Add assistant response to chat history
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
             st.text("Continue with the same context. Ask another question.")
             st.session_state.context_string=[]
