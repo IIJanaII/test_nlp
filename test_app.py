@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from transformers import AutoModelWithLMHead, AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 import time
 
@@ -73,7 +73,7 @@ def preprocess_text(text):
     return text
 
 tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-summarize-news")
-model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-summarize-news")
+model = AutoModelForCausalLM.from_pretrained("mrm8488/t5-base-finetuned-summarize-news")
 
 def summarize(text, max_length=150):
   input_ids = tokenizer.encode(text, return_tensors="pt", add_special_tokens=True)
