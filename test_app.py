@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-
+import time
 
 
 # Load Course dataset
@@ -140,6 +140,86 @@ def main():
                     st.write("   ---")
             else:
                 st.warning("Please enter a query summary before retrieving services.")
+
+    elif page == "Chatbot: Question Answering":
+        st.header("Try our Assistant chatbot to help you !")
+        st.subheader("Hello! How can I help you?")
+
+        
+        # Display chat messages from history
+        
+
+        
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        if "context_string" not in st.session_state:
+            st.session_state.context_string=[]
+
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+        
+        if prompt := st.chat_input("What is up?"):
+            # Add user message to chat history
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            # Display user message in chat message container
+            with st.chat_message("user"):
+                st.markdown(prompt)
+            
+
+        if prompt  and st.session_state.context_string==[] :
+                # Retrieve top documents using TF-IDF
+            similarity_scores_with_impact, top_documents = retrieve_top_documents(prompt, k=10)
+
+               
+
+                # Create context string for question answering
+            context_string = create_context_string(top_documents)
+            st.session_state.context_string = context_string
+
+                # Perform question answering
+            qa = pipeline('question-answering')
+            answer = qa(context=context_string, question=prompt)
+
+            with st.chat_message("assistant"):
+                message_placeholder=st.empty()
+                full_response=""
+                assistant_response=answer['answer']
+
+                for chunk in assistant_response.split():
+                    full_response += chunk + " "
+                    time.sleep(0.05)
+                    # Add a blinking cursor to simulate typing
+                    message_placeholder.markdown(full_response + "")
+                message_placeholder.markdown(full_response)
+             # Add assistant response to chat history
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+
+
+            
+                # Option to refresh or continue with the same context
+    elif prompt and st.session_state.context_string!=[]:
+            qa = pipeline('question-answering')
+            answer = qa(context=st.session_state.context_string, question=prompt)
+            print("prompt",prompt)
+
+            with st.chat_message("assistant"):
+                message_placeholder=st.empty()
+                full_response=""
+                assistant_response=answer['answer']
+
+                for chunk in assistant_response.split():
+                    full_response += chunk + " "
+                    time.sleep(0.05)
+                    # Add a blinking cursor to simulate typing
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+             # Add assistant response to chat history
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+    else:
+            st.text("Continue with the same context. Ask another question.")
+            st.session_state.context_string=[]
     
 
 
