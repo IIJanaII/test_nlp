@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from transformers import AutoModelWithLMHead, AutoTokenizer
 
 import time
 
@@ -13,8 +12,6 @@ import time
 
 df=pd.read_csv("df_mergedV4.csv",sep=',')
 filtered_documents=df.copy()
-
-qa = pipeline('question-answering')
 
 @st.cache_data(persist=True)
 def get_tfidf_vectorizer(description_trad_clean):
@@ -72,17 +69,6 @@ def preprocess_text(text):
 
     return text
 
-tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-summarize-news")
-model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-summarize-news")
-
-def summarize(text, max_length=150):
-  input_ids = tokenizer.encode(text, return_tensors="pt", add_special_tokens=True)
-
-  generated_ids = model.generate(input_ids=input_ids, num_beams=2, max_length=max_length,  repetition_penalty=2.5, length_penalty=1.0, early_stopping=True)
-
-  preds = [tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True) for g in generated_ids]
-
-  return preds[0]
 
 
 
@@ -119,7 +105,7 @@ def main():
 
     elif page == "Service Retrieval":
         st.header("Service Retrieval Page")
-        query_summary = st.text_area("✏️ Enter your request :")
+        query_summary = st.text_area("✏ Enter your request :")
 
         if st.button("Retrieve Services"):
             if query_summary:
@@ -133,8 +119,8 @@ def main():
                 # Display the top 10 results
                 st.subheader("Top 10 Services:")
                 for i, (index, row) in enumerate(top_documents.iterrows(), 1):
-                    st.write(f"{i}. **{row['name']}**")
-                    st.write(f"   Average Score: {row['average_score']:.2f} ⭐️")
+                    st.write(f"{i}. *{row['name']}*")
+                    st.write(f"   Average Score: {row['average_score']:.2f} ⭐")
 
                     # Calculate impact based on average score (customize the impact calculation as needed)
                     impact = row['average_score'] * 0.1  # Adjust the multiplication factor as needed
@@ -192,7 +178,7 @@ def main():
             st.session_state.context_string = context_string
 
                 # Perform question answering
-            
+            qa = pipeline('question-answering')
             answer = qa(context=context_string, question=prompt)
 
             with st.chat_message("assistant"):
@@ -231,27 +217,11 @@ def main():
                     message_placeholder.markdown(full_response)
                 # Add assistant response to chat history
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
-        else:
+    else:
             st.text("Continue with the same context. Ask another question.")
             st.session_state.context_string=[]
     
 
-    elif page=="Summary":
-        st.header("Review Summarization Page")
-        st.write("Enter your review below, and we will provide a summary for you.")
 
-        # User input for review
-        user_review = st.text_area("Enter your review here:")
-
-        if st.button("Generate Summary"):
-            # Perform summarization (you may need to replace this with your summarization logic)
-            # For this example, let's assume a simple summary by taking the first 50 characters of the review
-            summary = summarize(user_review)
-            
-            st.subheader("Review Summary:")
-            st.write(summary)
-    
-
-
-if __name__ == "__main__":
-    main()
+if _name_ == "_main_":
+    main()
